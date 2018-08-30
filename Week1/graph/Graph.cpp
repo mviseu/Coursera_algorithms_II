@@ -1,14 +1,13 @@
 #include "Graph.h"
 #include <algorithm>
 #include <functional>
-#include <stdexcept>
 #include <numeric>
+#include <stdexcept>
 #include <sstream>
 
 namespace {
 
 std::vector<std::vector<int>> ReadEdges(std::istream& is, std::vector<std::vector<int>>&& adj, int nrEdges) {
-	
 	for(auto i = 0; i != nrEdges; ++i) {
 		int first, second;
 		if(is >> first && is >> second) {
@@ -23,14 +22,14 @@ std::vector<std::vector<int>> ReadEdges(std::istream& is, std::vector<std::vecto
 
 } // namespace
 
-Graph::Graph(int v) : adjacents(std::vector<std::vector<int>>(v - 1, std::vector<int>())) {}
+Graph::Graph(int v) : adjacents(std::vector<std::vector<int>>(v, std::vector<int>())) {}
 
 Graph::Graph(std::istream& is) {
-         	int nrVertices = 0;
+    int nrVertices = 0;
 	if(is >> nrVertices) {
-		adjacents = std::vector<std::vector<int>>(nrVertices - 1, std::vector<int>());
+		adjacents = std::vector<std::vector<int>>(nrVertices, std::vector<int>());
 		int nrEdges = 0;
-		if(is >> nrEdges) {	
+		if(is >> nrEdges) {
 			adjacents = ReadEdges(is, std::move(adjacents), nrEdges);
 		}
 	} else {
@@ -61,7 +60,7 @@ std::vector<int> Graph::Adj(int v) const {
 }
 
 void Graph::AddEdge(int v, int w) {
-	   adjacents[v].push_back(w);
+	adjacents[v].push_back(w);
 	adjacents[w].push_back(v);
 
 }
@@ -76,8 +75,3 @@ int Graph::E() const {
 		});
 	return pairedEdges / 2;
 }
-
-int main() {
-	std::cout << "Hello, World!" << std::endl;
-}
-
