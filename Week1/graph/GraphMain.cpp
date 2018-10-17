@@ -1,4 +1,5 @@
 #include "BreadthFirst.h"
+#include "ConnectedComponents.h"
 #include "DepthFirst.h"
 #include "Graph.h"
 #include "Paths.h"
@@ -28,5 +29,15 @@ int main() {
 	HasPathWrite(*paths, 5);
 	HasPathWrite(*paths, 8);
 	HasPathWrite(*paths, 3);
+
+	std::cout << "Get all connected components" << std::endl;
+	const auto cc = ConnectedComponents(g);
+	for(auto v = 0; v < g.V(); ++v) {
+		if(cc.Id(v)) {
+			std::cout << v << " is at connected component " << *cc.Id(v) << std::endl;
+		} else {
+			std::cout << v << " is not on any connected component" << std::endl;
+		}
+	}
 	return 0;
 }
