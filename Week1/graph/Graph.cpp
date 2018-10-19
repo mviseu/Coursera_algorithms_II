@@ -1,4 +1,5 @@
 #include "Graph.h"
+#include "GraphCommon.h"
 #include <algorithm>
 #include <functional>
 #include <numeric>
@@ -6,6 +7,20 @@
 #include <sstream>
 
 namespace {
+
+std::vector<std::vector<int>> RemoveDuplicates(const std::vector<std::vector<int>>& adjacents) {
+	std::vector<std::vector<int>> cpAdj;
+	std::copy(adjacents.cbegin(), adjacents.cend(), std::back_inserter(cpAdj));
+	for(auto v = 0; v < CountVertices(cpAdj); ++v) {
+		for(auto eIndex = 0; eIndex < static_cast<int>(cpAdj[v].size()); ++eIndex) {
+			const auto e = cpAdj[v][eIndex];
+			auto vInE = std::find(cpAdj[e].begin(), cpAdj[e].end(), v);
+			cpAdj[e].erase(vInE);
+		}
+	}
+	return cpAdj;
+}
+
 
 std::vector<std::vector<int>> ReadEdges(std::istream& is, std::vector<std::vector<int>>&& adj, int nrEdges) {
 	for(auto i = 0; i != nrEdges; ++i) {
@@ -38,40 +53,27 @@ Graph::Graph(std::istream& is) {
 } 
 	
 Graph::operator std::string() const {
-	std::vector<std::vector<int>> adjacentsCopy;
-	std::copy(adjacents.cbegin(), adjacents.cend(), std::back_inserter(adjacentsCopy));
 	std::ostringstream os;
 	os << V() << std::endl;
 	os << E() << std::endl;
-	for(auto adjacent = adjacentsCopy.cbegin(); adjacent != adjacentsCopy.cend(); ++adjacent) {
-		const auto firstV = std::distance(adjacentsCopy.cbegin(), adjacent);
-		for(int secondV : *adjacent) {
-			os << firstV << " "  
-			<< secondV << std::endl;
-			auto pairedEdge = std::find(adjacentsCopy[secondV].begin(), adjacentsCopy[secondV].end(), firstV);
-			adjacentsCopy[secondV].erase(pairedEdge);
-		}
-	}
+	PrintEdges(os, RemoveDuplicates(adjacents));
 	return os.str();
 }
 
 std::vector<int> Graph::Adj(int v) const {
-	return adjacents[v];     
+	return GetOutEdges(adjacents, v);
 }
 
-void Graph::AddEdge(int v, int w) {
-	adjacents[v].push_back(w);
-	adjacents[w].push_back(v);
 
+void Graph::AddEdge(int v, int w) {
+	AddOutEdge(adjacents, v, w);
+	AddOutEdge(adjacents, w, v);
 }
 
 int Graph::V() const {
-	return adjacents.size();
+	return CountVertices(adjacents);
 }	
 
 int Graph::E() const {
-	const int pairedEdges = std::accumulate(adjacents.cbegin(), adjacents.cend(), 0, [](int lhs, const std::vector<int>& rhs) -> int {
-			return lhs + static_cast<int>(rhs.size());
-		});
-	return pairedEdges / 2;
+	return CountEdges(adjacents) / 2;
 }
