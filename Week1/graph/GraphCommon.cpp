@@ -2,6 +2,39 @@
 #include <algorithm>
 #include <numeric>
 
+auto ReadNrVertices(std::istream& is) -> int {
+	int nrVertices;
+	if(!(is >> nrVertices)) {
+		throw std::runtime_error("Unable to read number of vertices");
+	}
+	return nrVertices;
+}
+
+auto ReadNrEdges(std::istream& is) -> int {
+	int nrEdges = 0;
+	if(!(is >> nrEdges)) {
+		throw std::runtime_error("Unable to read nr of edges");	
+	}
+	return nrEdges;
+}
+
+auto ReadOutEdges(std::istream& is, int nrEdges) -> std::vector<std::pair<int, int>> {
+	std::vector<std::pair<int, int>> edges;
+	for(auto i = 0; i != nrEdges; ++i) {
+		int first, second;
+		if(is >> first && is >> second) {
+			edges.emplace_back(std::make_pair(first, second));
+		} else {
+			throw std::runtime_error("Unable to read vertice in edge");
+		}
+	}
+	return edges;
+}
+
+auto CreateEmptyGraph(int v) -> std::vector<std::vector<int>> {
+	return std::vector<std::vector<int>>(v, std::vector<int>());
+}
+
 auto PrintEdges(std::ostream& os, const std::vector<std::vector<int>>& outEdges) -> std::ostream& {
 	for(auto v = 0; v < CountVertices(outEdges); ++v) {
 		for(auto e = 0; e < static_cast<int>(outEdges[v].size()); ++e) {

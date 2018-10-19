@@ -22,34 +22,23 @@ std::vector<std::vector<int>> RemoveDuplicates(const std::vector<std::vector<int
 }
 
 
-std::vector<std::vector<int>> ReadEdges(std::istream& is, std::vector<std::vector<int>>&& adj, int nrEdges) {
-	for(auto i = 0; i != nrEdges; ++i) {
-		int first, second;
-		if(is >> first && is >> second) {
-			adj[first].push_back(second);
-			adj[second].push_back(first);
-		} else {
-			throw std::runtime_error("Unable to read vertice in edge");
-		}
+std::vector<std::vector<int>> GetEdges(std::vector<std::vector<int>>&& adj, const std::vector<std::pair<int, int>>& outEdges) {
+	for(const auto& outEdge : outEdges) {
+		adj[outEdge.first].push_back(outEdge.second);
+		adj[outEdge.second].push_back(outEdge.first);
 	}
 	return std::move(adj);
 }
 
 } // namespace
 
-Graph::Graph(int v) : adjacents(std::vector<std::vector<int>>(v, std::vector<int>())) {}
+Graph::Graph(int v) : adjacents(CreateEmptyGraph(v)) {}
 
 Graph::Graph(std::istream& is) {
-    int nrVertices = 0;
-	if(is >> nrVertices) {
-		adjacents = std::vector<std::vector<int>>(nrVertices, std::vector<int>());
-		int nrEdges = 0;
-		if(is >> nrEdges) {
-			adjacents = ReadEdges(is, std::move(adjacents), nrEdges);
-		}
-	} else {
-		throw std::runtime_error("Unable to read number of vertices or edges");
-	}
+    int nrVertices = ReadNrVertices(is);
+    adjacents = CreateEmptyGraph(nrVertices);
+    int nrEdges = ReadNrEdges(is);
+	adjacents = GetEdges(std::move(adjacents), ReadOutEdges(is, nrEdges));
 } 
 	
 Graph::operator std::string() const {

@@ -1,9 +1,29 @@
 #include "DiGraph.h"
 #include "GraphCommon.h"
-#include <ostringstream>
+#include <sstream>
+
+namespace {
+
+auto GetEdges(std::vector<std::vector<int>>&& adj, const std::vector<std::pair<int, int>>& outEdges) -> std::vector<std::vector<int>> {
+	for(const auto& outEdge : outEdges) {
+		adj[outEdge.first].push_back(outEdge.second);
+	}
+	return std::move(adj);
+}
+
+} // namespace
 
 
-explicit DiGraph::operator std::string() const {
+DiGraph::DiGraph(std::istream& is) {
+    int nrVertices = ReadNrVertices(is);
+    m_outEdges = CreateEmptyGraph(nrVertices);
+    int nrEdges = ReadNrEdges(is);
+	m_outEdges = GetEdges(std::move(m_outEdges), ReadOutEdges(is, nrEdges));
+} 
+
+DiGraph::DiGraph(int v) : m_outEdges(CreateEmptyGraph(v)) {}
+
+DiGraph::operator std::string() const {
 	std::ostringstream os;
 	os << V() << std::endl;
 	os << E() << std::endl;
