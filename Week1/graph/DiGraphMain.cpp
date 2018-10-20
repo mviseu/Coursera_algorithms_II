@@ -1,4 +1,5 @@
 #include "DiGraph.h"
+#include "Cycles.h"
 #include "DepthFirstOrder.h"
 #include <algorithm>
 #include <fstream>
@@ -6,6 +7,7 @@
 #include <string>
 
 int main() {
+	/*
 	std::ifstream file("TopologicalSortGraph.txt");
 	DiGraph g(file);
 	std::cout << std::string(g) << std::endl;
@@ -13,5 +15,12 @@ int main() {
 	const auto topOrder = dfo.TopologicalSort();
 	std::ostream_iterator<int> out(std::cout, " ");
 	std::copy(topOrder.cbegin(), topOrder.cend(), out);
+	std::cout << std::endl;
+	*/
+
+	std::cout << "Start of cycles" << std::endl;
+	std::ifstream fileCycles("TinyDiGraph.txt");
+	DiGraph g2(fileCycles);
+	GetCycles(g2);
 	return 0;
 }

@@ -1,5 +1,6 @@
 #include "DiGraph.h"
 #include "GraphCommon.h"
+#include <algorithm>
 #include <sstream>
 
 namespace {

@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -12,6 +13,11 @@ public:
 	auto AddEdge(int v, int w) -> void;
 	auto V() const -> int;
 	auto E() const -> int;
+	auto Cycles() const -> std::vector<std::vector<int>> const;
+	auto IsCyclic() const -> bool;
 private:
+	auto Dfs(int vert, 
+			 std::vector<std::optional<int>>& comesFrom,
+			 std::vector<int>& endCycles) const -> void;
 	std::vector<std::vector<int>> m_outEdges;
 };
