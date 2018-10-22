@@ -21,6 +21,10 @@ int main() {
 	std::cout << "Start of cycles" << std::endl;
 	std::ifstream fileCycles("TinyDiGraph.txt");
 	DiGraph g2(fileCycles);
-	GetCycles(g2);
+	std::ostream_iterator<int> out(std::cout, " ");
+	for(const auto& cycle : GetCycles(g2)) {
+		std::copy(cycle.cbegin(), cycle.cend(), out);
+		std::cout << std::endl;
+	}
 	return 0;
 }

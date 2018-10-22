@@ -29,8 +29,43 @@ auto Dfs(const DiGraph& gr, int v, const Reachability& reach, int id) -> void {
 	}
 }
 
+auto IsAlreadyInPath(int v, const std::vector<int>& path) -> bool {
+	return std::find(path.cbegin(), path.cend(), v) != path.cend();
+}
 
-auto GetCycles(const DiGraph& gr) -> void {
+auto HasPotentialCycleBeenSeen(int prev, int curr) -> bool {
+	return prev < curr;
+}
+
+auto Bdfs(int target, int v, const std::vector<std::vector<int>>& inVertices, 
+		  const std::vector<int>& path, 
+		  std::vector<std::vector<int>>& bdfs) -> void {
+	for(auto comeFrom : inVertices[v]) {
+			if(comeFrom == v) {
+				continue;
+			}
+			if(comeFrom == target) {
+				bdfs.push_back(path);
+				continue;
+			}
+			if(IsAlreadyInPath(comeFrom, path) || HasPotentialCycleBeenSeen(comeFrom, target)) {
+				continue;
+			}
+			auto newPath = path;
+			newPath.push_back(comeFrom);
+			Bdfs(target, comeFrom, inVertices, newPath, bdfs);
+	}
+}
+
+auto RevertCycles(std::vector<std::vector<int>>&& cycles) -> std::vector<std::vector<int>> {
+	for(auto& backCycle : cycles) {
+		std::reverse(backCycle.begin(), backCycle.end());
+	} 
+	return std::move(cycles);
+}
+
+
+auto GetCycles(const DiGraph& gr) -> std::vector<std::vector<int>> {
 	const auto nrVert = gr.V();
 	auto reach = Reachability(nrVert);
 	// first step is to mark all componentIds, inVertices with same Ids with dfs algorithm
@@ -44,15 +79,14 @@ auto GetCycles(const DiGraph& gr) -> void {
 			++id;
 		}
 	}
-	std::cout << "components" << std::endl;
-	for(const auto& id : *reach.componentIds) {
-		std::cout << *id << std::endl;
-	}
-
-	std::cout << "inVertices" << std::endl;
-	std::ostream_iterator<int> out(std::cout, " ");
-	for(const auto& in : *reach.inVertices) {
-		std::copy(in.begin(), in.end(), out);
-		std::cout << std::endl;
-	}
+	// second step is to go through all invertices with dim > 1 and check for cycles
+	auto bdfs = std::vector<std::vector<int>>();
+	for(auto i = 0; i < nrVert; ++i) {
+		if((*reach.inVertices)[i].size() > 1) {
+			const auto path = std::vector<int>({i});
+			Bdfs(i, i, *reach.inVertices, path, bdfs);
+		}
+	} 
+	// revert all cycles to have them in correct direction
+	return RevertCycles(std::move(bdfs));
 }
