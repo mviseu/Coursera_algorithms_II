@@ -1,8 +1,14 @@
 #include "Trie.h"
+#include <iostream>
 #include <tuple>
 #include <utility>
 
 namespace {
+
+int GetIndex(char c) {
+	const auto base = static_cast<int>('a');
+	return static_cast<int>(c - base);
+}
 
 int Size(const std::string& str) {
 	return static_cast<int>(str.size());
@@ -25,8 +31,9 @@ std::pair<bool, std::unique_ptr<Node<Val, R>>> InsertRec(std::unique_ptr<Node<Va
 		}
 	}
 	const auto charact = key[depth];
+	const auto index = GetIndex(charact);
 	auto inserted = false;
-	std::tie(inserted, node->next[charact]) = InsertRec(std::move(node->next[charact]), key, val, depth + 1);
+	std::tie(inserted, node->next[index]) = InsertRec(std::move(node->next[index]), key, val, depth + 1);
 	return std::make_pair(inserted, std::move(node));
 }
 
@@ -36,7 +43,8 @@ std::optional<Val> FindRec(const Node<Val, R>& node, const std::string& key, int
 		return node.val;
 	}
 	const auto charact = key[depth];
-	return node.next[charact] != nullptr ? FindRec(*node.next[charact], key, depth + 1) : std::nullopt;
+	const auto index = GetIndex(charact);
+	return node.next[index] != nullptr ? FindRec(*node.next[index], key, depth + 1) : std::nullopt;
 }
 
 /*
