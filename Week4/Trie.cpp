@@ -15,6 +15,13 @@ int Size(const std::string& str) {
 }
 
 template <typename Val, int R>
+bool HasAnyChild(const Node<Val, R>& node) {
+	return std::any_of(node.next.cbegin(), node.next.cend(), [](const std::unique_ptr<Node<Val, R>>& link) {
+		return link != nullptr;
+	});
+}
+
+template <typename Val, int R>
 std::pair<bool, std::unique_ptr<Node<Val, R>>> InsertRec(std::unique_ptr<Node<Val, R>> node, 
 					   									 const std::string& key,
 					   									 const Val& val,
@@ -47,16 +54,26 @@ std::optional<Val> FindRec(const Node<Val, R>& node, const std::string& key, int
 	return node.next[index] != nullptr ? FindRec(*node.next[index], key, depth + 1) : std::nullopt;
 }
 
-/*
+
 template <typename Val, int R>
-bool EraseRec(const Node<Val, R>& node, const std::string& key, int depth) {
-	if(key.size() == depth) {
-		return node.val;
+std::unique_ptr<Node<Val, R>> EraseRec(std::unique_ptr<Node<Val, R>> node, const std::string& key, int depth) {
+	if(node == nullptr) {
+		return std::move(node);
+	}
+	if(depth == Size(key)) {
+		node->val = std::nullopt;
+	}
+	if(node->val == std::nullopt && !HasAnyChild(*node)) {
+		return nullptr;
+	}
+	if(depth == Size(key)) {
+		return std::move(node);
 	}
 	const auto charact = key[depth];
-	return node.next[charact] != nullptr ? FindRec(*node.next[charact], key, depth + 1) : std::nullopt;
+	const auto index = GetIndex(charact);
+	node->next[index] = EraseRec(std::move(node->next[index]), key, depth + 1);
+	return std::move(node);
 }
-*/
 
 } // namespace
 
@@ -73,14 +90,12 @@ std::optional<Val> Trie<Val, R>::Find(const std::string& key) const {
 	return m_root != nullptr ? FindRec(*m_root, key, 0) : std::nullopt;
 }
 
-template class Trie<int, NrAlpha>;
-template struct Node<int, NrAlpha>;
-
-/*
 
 template <typename Val, int R>
-bool Trie<Val, R>::Erase(const std::string& key) {
-	return m_root != nullptr ? EraseRec(*m_root, key, 0) : false;
+void Trie<Val, R>::Erase(const std::string& key) {
+	m_root = EraseRec(std::move(m_root), key, 0);
 }
-*/
+
+template class Trie<int, NrAlpha>;
+template struct Node<int, NrAlpha>;
 

@@ -24,7 +24,7 @@ class Trie {
 public:
 	Trie() = default;
 	bool Insert(const std::string& key, const Val& val);
-	// bool Erase(const std::string& key);
+	void Erase(const std::string& key);
 	std::optional<Val> Find(const std::string& key) const;
 
 private:
