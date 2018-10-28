@@ -7,6 +7,7 @@
 template <typename Val>
 struct Node {
 	Node() = default;
+	Node(char c) : charac(c) {}
 	char charac = 'a';
 	std::optional<Val> val = std::nullopt;
 	std::unique_ptr<Node<Val>> left = nullptr;
@@ -19,7 +20,7 @@ template <typename Val>
 class TernarySearchTrie {
 public:
 	TernarySearchTrie() = default;
-	//auto Insert(const std::string& key, const Val& val) -> bool;
+	auto Insert(const std::string& key, const Val& val) -> bool;
 	//auto Erase(const std::string& key) -> void;
 	auto Find(const std::string& key) const -> std::optional<Val>;
 

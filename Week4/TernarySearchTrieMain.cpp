@@ -3,6 +3,7 @@
 
 int main() {
 	TernarySearchTrie<int> tst;
+	tst.Insert("somekey", 1);
 	if(const auto findKey = tst.Find("somekey")) {
 		std::cout << "found key" << std::endl;
 	} else {
