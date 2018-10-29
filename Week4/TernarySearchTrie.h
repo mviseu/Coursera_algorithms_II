@@ -21,7 +21,7 @@ class TernarySearchTrie {
 public:
 	TernarySearchTrie() = default;
 	auto Insert(const std::string& key, const Val& val) -> bool;
-	//auto Erase(const std::string& key) -> void;
+	auto Erase(const std::string& key) -> void;
 	auto Find(const std::string& key) const -> std::optional<Val>;
 
 private:
