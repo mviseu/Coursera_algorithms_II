@@ -62,16 +62,14 @@ std::unique_ptr<Node<Val, R>> EraseRec(std::unique_ptr<Node<Val, R>> node, const
 	}
 	if(depth == Size(key)) {
 		node->val = std::nullopt;
+	} else {
+		const auto charact = key[depth];
+		const auto index = GetIndex(charact);
+		node->next[index] = EraseRec(std::move(node->next[index]), key, depth + 1);
 	}
 	if(node->val == std::nullopt && !HasAnyChild(*node)) {
 		return nullptr;
 	}
-	if(depth == Size(key)) {
-		return std::move(node);
-	}
-	const auto charact = key[depth];
-	const auto index = GetIndex(charact);
-	node->next[index] = EraseRec(std::move(node->next[index]), key, depth + 1);
 	return std::move(node);
 }
 
