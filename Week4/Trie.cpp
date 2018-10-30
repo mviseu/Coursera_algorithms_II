@@ -1,5 +1,7 @@
 #include "Trie.h"
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <tuple>
 #include <utility>
 
@@ -52,13 +54,20 @@ std::pair<bool, std::unique_ptr<Node<Val, R>>> InsertRec(std::unique_ptr<Node<Va
 }
 
 template <typename Val, int R>
-std::optional<Val> FindRec(const Node<Val, R>& node, const std::string& key, int depth) {
+std::pair<std::optional<Val>, std::unique_ptr<Node<Val, R>>> FindRec(std::unique_ptr<Node<Val, R>> node, 
+																	 const std::string& key, 
+																	 int depth) {
+	if(!node) {
+		return std::make_pair(std::nullopt, std::move(node));
+	}
 	if(depth == Size(key)) {
-		return node.val;
+		return std::make_pair(node->val, std::move(node));
 	}
 	const auto charact = key[depth];
 	const auto index = GetIndex(charact);
-	return node.next[index] != nullptr ? FindRec(*node.next[index], key, depth + 1) : std::nullopt;
+	auto val = std::optional<Val>();
+	std::tie(val, node->next[index]) = FindRec(std::move(node->next[index]), key, depth + 1);
+	return std::make_pair(val, std::move(node));
 }
 
 template <typename Val, int R>
@@ -74,6 +83,13 @@ void KeysRec(const Node<Val, R>& node, std::vector<std::string>& keys, const std
 		KeysRec(*node.next[i], keys, newWord);
 	}
 }
+
+/*
+template <typename Val, int R>
+void KeysWithPrefixRec(const Node<Val, R>& node, std::vector<std::string>& keys, const std::string& prefix, const std::string& word) {
+	
+}
+*/
 
 
 template <typename Val, int R>
@@ -96,6 +112,7 @@ std::unique_ptr<Node<Val, R>> EraseRec(std::unique_ptr<Node<Val, R>> node, const
 
 } // namespace
 
+
 template <typename Val, int R>
 bool Trie<Val, R>::Insert(const std::string& key, const Val& val) {
 	auto isInserted = false;
@@ -103,10 +120,12 @@ bool Trie<Val, R>::Insert(const std::string& key, const Val& val) {
 	return isInserted;
 }
 
-
 template <typename Val, int R>
 std::optional<Val> Trie<Val, R>::Find(const std::string& key) const {
-	return m_root != nullptr ? FindRec(*m_root, key, 0) : std::nullopt;
+	auto copy = *this;
+	auto val = std::optional<Val>();
+	std::tie(val, copy.m_root) = FindRec(std::move(copy.m_root), key, 0);
+	return val;
 }
 
 
@@ -124,6 +143,17 @@ std::vector<std::string> Trie<Val, R>::Keys() const {
 	}
 	return keys;
 }
+
+/*
+template <typename Val, int R>
+std::vector<std::string> Trie<Val, R>::KeysWithPrefix(const std::string& prefix) const {
+	std::vector<std::string> keys;
+	if(m_root) {
+		KeysWithPrefixRec(*m_root, keys, prefix, "");
+	}
+	return keys;
+}
+*/
 
 template class Trie<int, NrAlpha>;
 template struct Node<int, NrAlpha>;
