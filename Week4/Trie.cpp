@@ -5,9 +5,16 @@
 
 namespace {
 
+int GetBase() {
+	return static_cast<int>('a');
+}
+
 int GetIndex(char c) {
-	const auto base = static_cast<int>('a');
-	return static_cast<int>(c - base);
+	return static_cast<int>(c) - GetBase();
+}
+
+char GetChar(int index) {
+	return static_cast<char>(index + GetBase());
 }
 
 int Size(const std::string& str) {
@@ -54,6 +61,20 @@ std::optional<Val> FindRec(const Node<Val, R>& node, const std::string& key, int
 	return node.next[index] != nullptr ? FindRec(*node.next[index], key, depth + 1) : std::nullopt;
 }
 
+template <typename Val, int R>
+void KeysRec(const Node<Val, R>& node, std::vector<std::string>& keys, const std::string& word) {
+	for(auto i = 0; i < R; ++i) {
+		if(!node.next[i]) {
+			continue;
+		}
+		const auto newWord = word + GetChar(i);
+		if(node.next[i]->val) {
+			keys.push_back(newWord);
+		}
+		KeysRec(*node.next[i], keys, newWord);
+	}
+}
+
 
 template <typename Val, int R>
 std::unique_ptr<Node<Val, R>> EraseRec(std::unique_ptr<Node<Val, R>> node, const std::string& key, int depth) {
@@ -92,6 +113,16 @@ std::optional<Val> Trie<Val, R>::Find(const std::string& key) const {
 template <typename Val, int R>
 void Trie<Val, R>::Erase(const std::string& key) {
 	m_root = EraseRec(std::move(m_root), key, 0);
+}
+
+
+template <typename Val, int R>
+std::vector<std::string> Trie<Val, R>::Keys() const {
+	std::vector<std::string> keys;
+	if(m_root) {
+		KeysRec(*m_root, keys, "");
+	}
+	return keys;
 }
 
 template class Trie<int, NrAlpha>;

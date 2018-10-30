@@ -26,6 +26,7 @@ public:
 	bool Insert(const std::string& key, const Val& val);
 	void Erase(const std::string& key);
 	std::optional<Val> Find(const std::string& key) const;
+	std::vector<std::string> Keys() const;
 
 private:
 	std::unique_ptr<Node<Val, R>> m_root = nullptr;

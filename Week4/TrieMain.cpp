@@ -2,6 +2,8 @@
 #include <iostream>
 #include <iterator>
 
+namespace {
+
 constexpr const auto nrAlpha = 26;
 
 void PrintVal(const Trie<int, nrAlpha>& trie, const std::string& key) {
@@ -16,10 +18,19 @@ void PrintVal(const Trie<int, nrAlpha>& trie, const std::string& key) {
 
 }
 
+void PrintKeys(const Trie<int, nrAlpha>& trie) {
+	const auto keys = trie.Keys();
+	std::cout << "Starting to print all keys" << std::endl;
+	std::ostream_iterator<std::string> out(std::cout, "\n");
+	std::copy(keys.cbegin(), keys.cend(), out);
+}
+
+} // namespace
+
 int main() {
 	Trie<int, nrAlpha> trie;
 	std::ostream_iterator<bool> out(std::cout, "\n");
-	for(auto i = 0; i < 3; ++i) {
+	for(auto i = 0; i < 1; ++i) {
 		out = trie.Insert("she", 0);
 		out = trie.Insert("sells", 1);
 		out = trie.Insert("sea", 2);
@@ -36,6 +47,8 @@ int main() {
 		PrintVal(trie, "shelter");
 		PrintVal(trie, "random");
 		PrintVal(trie, "shore");
+
+		PrintKeys(trie);
 
 		trie.Erase("sh");
 		trie.Erase("she");
