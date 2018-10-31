@@ -91,6 +91,7 @@ public:
 	std::optional<Val> Find(const std::string& key) const;
 	std::vector<std::string> Keys() const;
 	std::vector<std::string> KeysWithPrefix(const std::string& prefix) const;
+	std::string LongestPrefixOf(const std::string& word) const;
 
 private:
 	std::unique_ptr<Node<Val, R>> m_root = nullptr;

@@ -27,7 +27,7 @@ void PrintWords(const std::vector<std::string>& words) {
 } // namespace
 
 int main() {
-	Trie<int, nrAlpha> trie;
+	Trie<int, nrAlpha> trie, trie2;
 	std::ostream_iterator<bool> out(std::cout, "\n");
 	for(auto i = 0; i < 1; ++i) {
 		out = trie.Insert("she", 0);
@@ -74,6 +74,13 @@ int main() {
 		PrintVal(trie, "shelter");
 		PrintVal(trie, "random");
 		PrintVal(trie, "shore");
+
+		trie2.Insert("shelters", 2);
+		trie2.Insert("she", 1);
+		trie2.Insert("sh", 5);
+		trie2.Insert("shelter", 4);
+		const auto longestPrefix = trie2.LongestPrefixOf("shelters");
+		std::cout << "Longest prefix of shelters is: " << longestPrefix << std::endl;
 	}
 
 	return 0;

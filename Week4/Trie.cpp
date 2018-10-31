@@ -67,6 +67,22 @@ std::optional<std::reference_wrapper<const Node<Val, R>>>FindRec(const Node<Val,
 }
 
 template <typename Val, int R>
+int LongestPrefixOfRec(const Node<Val, R>& node, const std::string& word, int length, int depth) {
+	if(node.val) {
+		length = depth;
+	}
+	if(depth == Size(word)) {
+		return length;
+	}
+	const auto charact = word[depth];
+	const auto index = GetIndex(charact);
+	if(node.next[index]) {
+ 		length = LongestPrefixOfRec(*node.next[index], word, length, depth + 1);
+	}
+	return length;
+}
+
+template <typename Val, int R>
 void KeysRec(const Node<Val, R>& node, std::vector<std::string>& keys, const std::string& word) {
 	for(auto i = 0; i < R; ++i) {
 		if(!node.next[i]) {
@@ -155,6 +171,15 @@ std::vector<std::string> Trie<Val, R>::KeysWithPrefix(const std::string& prefix)
 		}
 	}
 	return words;
+}
+
+template <typename Val, int R>
+std::string Trie<Val, R>::LongestPrefixOf(const std::string& word) const {
+	auto length = 0;
+	if(m_root) {
+		length = LongestPrefixOfRec(*m_root, word, 0, 0);
+	}
+	return word.substr(0, length);
 }
 
 template class Trie<int, NrAlpha>;
