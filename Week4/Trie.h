@@ -90,7 +90,7 @@ public:
 	void Erase(const std::string& key);
 	std::optional<Val> Find(const std::string& key) const;
 	std::vector<std::string> Keys() const;
-	//std::vector<std::string> KeysWithPrefix(const std::string& prefix) const;
+	std::vector<std::string> KeysWithPrefix(const std::string& prefix) const;
 
 private:
 	std::unique_ptr<Node<Val, R>> m_root = nullptr;

@@ -1,5 +1,6 @@
 #include "Trie.h"
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <tuple>
@@ -54,20 +55,15 @@ std::pair<bool, std::unique_ptr<Node<Val, R>>> InsertRec(std::unique_ptr<Node<Va
 }
 
 template <typename Val, int R>
-std::pair<std::optional<Val>, std::unique_ptr<Node<Val, R>>> FindRec(std::unique_ptr<Node<Val, R>> node, 
-																	 const std::string& key, 
-																	 int depth) {
-	if(!node) {
-		return std::make_pair(std::nullopt, std::move(node));
-	}
+std::optional<std::reference_wrapper<const Node<Val, R>>>FindRec(const Node<Val, R>& node, 
+																 const std::string& key, 
+										  						 int depth) {
 	if(depth == Size(key)) {
-		return std::make_pair(node->val, std::move(node));
+		return node;
 	}
 	const auto charact = key[depth];
 	const auto index = GetIndex(charact);
-	auto val = std::optional<Val>();
-	std::tie(val, node->next[index]) = FindRec(std::move(node->next[index]), key, depth + 1);
-	return std::make_pair(val, std::move(node));
+	return node.next[index] ? FindRec(*node.next[index], key, depth + 1) : std::nullopt;
 }
 
 template <typename Val, int R>
@@ -122,10 +118,11 @@ bool Trie<Val, R>::Insert(const std::string& key, const Val& val) {
 
 template <typename Val, int R>
 std::optional<Val> Trie<Val, R>::Find(const std::string& key) const {
-	auto copy = *this;
-	auto val = std::optional<Val>();
-	std::tie(val, copy.m_root) = FindRec(std::move(copy.m_root), key, 0);
-	return val;
+	if(m_root) {
+		const auto node = FindRec(*m_root, key, 0);
+		return node ? node->get().val : std::nullopt;
+	}
+	return std::nullopt;
 }
 
 
@@ -144,16 +141,21 @@ std::vector<std::string> Trie<Val, R>::Keys() const {
 	return keys;
 }
 
-/*
+
 template <typename Val, int R>
 std::vector<std::string> Trie<Val, R>::KeysWithPrefix(const std::string& prefix) const {
-	std::vector<std::string> keys;
+	auto words = std::vector<std::string>();
 	if(m_root) {
-		KeysWithPrefixRec(*m_root, keys, prefix, "");
+		const auto node = FindRec(*m_root, prefix, 0);
+		if(node) {
+			if(node->get().val) {
+				words.push_back(prefix);
+			}
+			KeysRec(node->get(), words, prefix);
+		}
 	}
-	return keys;
+	return words;
 }
-*/
 
 template class Trie<int, NrAlpha>;
 template struct Node<int, NrAlpha>;

@@ -18,11 +18,10 @@ void PrintVal(const Trie<int, nrAlpha>& trie, const std::string& key) {
 
 }
 
-void PrintKeys(const Trie<int, nrAlpha>& trie) {
-	const auto keys = trie.Keys();
-	std::cout << "Starting to print all keys" << std::endl;
+void PrintWords(const std::vector<std::string>& words) {
+	std::cout << "Starting to print all words" << std::endl;
 	std::ostream_iterator<std::string> out(std::cout, "\n");
-	std::copy(keys.cbegin(), keys.cend(), out);
+	std::copy(words.cbegin(), words.cend(), out);
 }
 
 } // namespace
@@ -48,7 +47,14 @@ int main() {
 		PrintVal(trie, "random");
 		PrintVal(trie, "shore");
 
-		PrintKeys(trie);
+		std::cout << "All keys" << std::endl;
+		const auto keys = trie.Keys();
+		PrintWords(keys);
+
+		const auto pre = std::string("she");
+		std::cout << "All keys with prefix " << pre << std::endl; 
+		PrintWords(trie.KeysWithPrefix(pre));
+
 
 		trie.Erase("sh");
 		trie.Erase("she");
